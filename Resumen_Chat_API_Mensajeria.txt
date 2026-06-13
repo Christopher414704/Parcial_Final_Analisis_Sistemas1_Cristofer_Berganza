@@ -1,0 +1,532 @@
+RESUMEN DEL CHAT - API REST DE MENSAJERÍA Y PAQUETERÍA
+
+Este archivo resume lo trabajado en este chat sobre la API REST de mensajería y paquetería.
+Incluye los prompts realizados, las correcciones aplicadas y una reflexión sencilla del proceso.
+
+
+============================================================
+1. PROMPTS REALIZADOS DURANTE EL CHAT
+============================================================
+
+PROMPT 1:
+Se pidió crear una API REST en C# para servicios de mensajería y paquetería a nivel nacional.
+
+Características solicitadas:
+- Rastreo en tiempo real de paquetes.
+- Cobertura en 18 departamentos de Guatemala.
+- Aproximadamente 500 envíos diarios en temporada alta.
+- Registro de envíos.
+- Cálculo automático de tarifa.
+- Código de rastreo generado automáticamente.
+- Historial por cada cambio de estado.
+- Descuento del 5% si remitente o destinatario tiene NIT válido.
+- Interfaz con Tailwind.
+- Código archivo por archivo, sin entregar un .zip.
+- Archivo de base de datos.
+
+Reglas solicitadas:
+- <= 1kg: Q25.00
+- 1.01kg a 5kg: Q45.00
+- 5.01kg a 10kg: Q75.00
+- > 10kg: Q100.00
+- Máximo 3 intentos de entrega.
+- Al tercer intento fallido, el envío cambia automáticamente a EnDevolucion.
+- Los estados solo pueden avanzar en una dirección.
+- Cada actualización debe incluir oficina.
+- Cada cambio debe guardarse en historial.
+
+
+PROMPT 2:
+Se pidió cambiar la interfaz inicial por una más dinámica para probar si funcionaba.
+
+Se propuso una página tipo panel con:
+- Registro de envíos.
+- Tabla de envíos.
+- Rastreo.
+- Cambio de estados.
+- Registro de intentos fallidos.
+- Historial visual.
+
+
+PROMPT 3:
+Se compartió un error de conexión con SQL Server para verificar qué significaba y cómo solucionarlo.
+
+El error indicaba:
+- SQL Server no fue encontrado.
+- La instancia configurada no era accesible.
+- El problema estaba en la cadena de conexión del archivo appsettings.json.
+
+Se explicó que no era error de Tailwind ni de la interfaz, sino de conexión a base de datos.
+
+
+PROMPT 4:
+Después de solucionar la conexión, se pidió mejorar el diseño de la página y separar funciones.
+
+Se propuso dividir el sistema en:
+- Inicio.
+- Registrar envíos.
+- Cambiar estados e historial.
+- Rastreo de paquetes.
+
+También se propuso mantener un diseño simple, no demasiado profesional, pero más entendible.
+
+
+PROMPT 5:
+Luego se decidió eliminar la interfaz gráfica y trabajar únicamente por Swagger.
+
+Se indicó qué eliminar:
+- Pages.
+- wwwroot.
+- Archivos de Razor Pages.
+- Layout visual.
+
+Se indicó qué conservar:
+- Controllers.
+- Data.
+- DTOs.
+- Models.
+- Services.
+- appsettings.json.
+- Program.cs.
+
+También se dejó Swagger habilitado y la raíz redirigida a /swagger.
+
+
+PROMPT 6:
+Se consultó un error de Swagger:
+
+- using directive is unnecessary IDE0005.
+- Microsoft.OpenApi.Models no existe.
+- OpenApiInfo no se encuentra.
+
+Se explicó que era por versión de Swashbuckle/OpenAPI.
+Se recomendó instalar una versión estable:
+
+dotnet remove package Swashbuckle.AspNetCore
+dotnet add package Swashbuckle.AspNetCore --version 6.6.2
+dotnet restore
+
+
+PROMPT 7:
+Se pidió generar direcciones para probar cada función en Postman y los JSON de cada parte del CRUD.
+
+Se entregaron endpoints para:
+- GET /api/oficinas
+- GET /api/envios
+- POST /api/envios
+- GET /api/envios/{codigoRastreo}
+- PUT /api/envios/{idEnvio}/estado
+- POST /api/envios/{idEnvio}/intento-entrega
+
+También se dieron JSON de prueba para:
+- Registrar envíos.
+- Cambiar estados.
+- Registrar intentos fallidos.
+- Probar tarifas.
+- Probar descuento por NIT.
+- Probar errores de estado inválido.
+
+
+PROMPT 8:
+Se preguntó cómo funcionaba la lógica de cambiar estados y cómo se validaba que no regresara a un estado anterior.
+
+Se explicó que originalmente se validaba en C# con un diccionario de transiciones permitidas.
+
+Luego se analizó una mejor opción:
+- Crear tabla EstadoEnvio.
+- Crear tabla TransicionEstado.
+- Usar IdEstado en lugar de texto.
+- Validar desde SQL si un cambio está permitido.
+
+Se concluyó que manejarlo desde SQL era más ordenado y profesional.
+
+
+PROMPT 9:
+Se pidió actualizar la API para manejar correctamente los cambios de estado desde SQL.
+
+Se propuso:
+- Crear tabla EstadoEnvio.
+- Crear tabla TransicionEstado.
+- Agregar IdEstado a Envio.
+- Agregar IdEstadoNuevo a HistorialEnvio.
+- Actualizar la vista vw_RastreoEnvios.
+- Crear modelo EstadoEnvio.cs.
+- Actualizar Envio.cs.
+- Actualizar HistorialEnvio.cs.
+- Actualizar RastreoResponse.cs.
+- Cambiar ActualizarEstadoRequest.cs para usar IdEstadoNuevo.
+- Crear EstadosController.cs.
+- Actualizar IEnvioService.cs.
+- Reemplazar EnvioService.cs.
+
+Desde ese cambio, la API valida transiciones consultando la tabla TransicionEstado.
+
+
+PROMPT 10:
+Se pidió crear pruebas unitarias usando xUnit o NUnit.
+
+Se eligió xUnit.
+
+Se generaron instrucciones para:
+- Crear proyecto MensajeriaApi.Tests.
+- Agregar referencia al proyecto principal.
+- Instalar paquetes de pruebas.
+- Crear clase EnvioRules.cs para aislar reglas de negocio.
+- Crear pruebas para tarifas.
+- Crear pruebas para NIT.
+- Crear pruebas para descuentos.
+- Crear pruebas para intentos de entrega.
+- Crear pruebas para estados.
+- Crear pruebas para DTOs.
+
+También se explicó cómo ejecutarlas con:
+
+dotnet test
+
+
+PROMPT 11:
+Se pidió crear un README.md con instrucciones de archivos del proyecto y cómo probarlo.
+
+Se generó un README con:
+- Descripción del proyecto.
+- Tecnologías usadas.
+- Estructura del proyecto.
+- Configuración de base de datos.
+- appsettings.json.
+- Endpoints disponibles.
+- JSON de prueba.
+- Estados permitidos.
+- Pruebas con Swagger.
+- Pruebas unitarias.
+- Comandos útiles.
+- Errores comunes.
+
+
+PROMPT 12:
+Se pidió generar un PDF con todo el chat, prompts, reflexión y correcciones realizadas.
+
+Se creó un PDF con diseño simple que resumía:
+- Prompts.
+- Correcciones.
+- Reflexión.
+- Cambios realizados.
+
+Después se pidió hacerlo mejor en .txt porque eso era lo que solicitaban.
+
+
+============================================================
+2. CORRECCIONES REALIZADAS
+============================================================
+
+CORRECCIÓN 1: CONEXIÓN A SQL SERVER
+
+Problema:
+La API no podía conectarse a SQL Server.
+
+Causa:
+La cadena de conexión apuntaba a una instancia incorrecta o no disponible.
+
+Solución:
+Se recomendó revisar el nombre real de la instancia en SQL Server Management Studio y ajustar appsettings.json.
+
+Ejemplos:
+Server=localhost;
+Server=.\SQLEXPRESS;
+Server=KAZ\SQLEXPRESS;
+Server=(localdb)\MSSQLLocalDB;
+
+
+CORRECCIÓN 2: ERROR DE SWAGGER Y OPENAPI
+
+Problema:
+Aparecieron errores con:
+
+Microsoft.OpenApi.Models
+OpenApiInfo
+
+Causa:
+La versión instalada de Swashbuckle usaba cambios nuevos en namespaces.
+
+Solución:
+Se recomendó usar Swashbuckle.AspNetCore versión 6.6.2 para mantener compatibilidad con:
+
+using Microsoft.OpenApi.Models;
+
+
+CORRECCIÓN 3: CAMBIO DE INTERFAZ GRÁFICA A API PURA
+
+Problema:
+Primero se había creado una interfaz con Tailwind, pero después ya no era necesaria.
+
+Solución:
+Se decidió eliminar:
+- Pages.
+- wwwroot.
+- Archivos visuales.
+
+Se dejó la API funcionando únicamente con:
+- Controllers.
+- Models.
+- DTOs.
+- Services.
+- Data.
+- Swagger.
+
+
+CORRECCIÓN 4: VALIDACIÓN DE ESTADOS
+
+Problema:
+La validación de estados estaba escrita directamente en C# usando textos.
+
+Limitación:
+Podía funcionar, pero no era lo más ordenado para un proyecto con base de datos.
+
+Solución:
+Se movió la lógica de estados a SQL Server.
+
+Se agregaron:
+- EstadoEnvio.
+- TransicionEstado.
+- IdEstado en Envio.
+- IdEstadoNuevo en HistorialEnvio.
+
+Ahora la API consulta SQL para saber si una transición es válida.
+
+
+CORRECCIÓN 5: JSON DE CAMBIO DE ESTADO
+
+Antes se enviaba:
+
+{
+  "nuevoEstado": "EnTransito",
+  "idOficina": 1,
+  "notas": "Cambio de estado"
+}
+
+Después se cambió a:
+
+{
+  "idEstadoNuevo": 2,
+  "idOficina": 1,
+  "notas": "Cambio de estado"
+}
+
+Esto se hizo porque los estados ahora se manejan por ID desde la base de datos.
+
+
+CORRECCIÓN 6: REGLAS DE NEGOCIO PARA PRUEBAS UNITARIAS
+
+Problema:
+Las reglas de tarifa, NIT e intentos estaban dentro del servicio, lo que hacía más incómodo probarlas directamente.
+
+Solución:
+Se creó una clase separada:
+
+Rules/EnvioRules.cs
+
+Con métodos para:
+- CalcularTarifa.
+- NitEsValido.
+- CalcularDescuento.
+- CalcularTotal.
+- CalcularNuevoIntento.
+- DebePasarADevolucion.
+
+Esto facilitó crear pruebas unitarias limpias.
+
+
+============================================================
+3. ARCHIVOS PRINCIPALES GENERADOS O MODIFICADOS
+============================================================
+
+BASE DE DATOS:
+- MensajeriaDB.sql
+- Tablas Cliente, Oficina, Envio, HistorialEnvio.
+- Luego se agregaron EstadoEnvio y TransicionEstado.
+- Vista vw_RastreoEnvios.
+
+CONTROLADORES:
+- EnviosController.cs
+- OficinasController.cs
+- EstadosController.cs
+
+MODELOS:
+- Envio.cs
+- Oficina.cs
+- HistorialEnvio.cs
+- EstadoEnvio.cs
+
+DTOs:
+- ClienteRequest.cs
+- CrearEnvioRequest.cs
+- ActualizarEstadoRequest.cs
+- RegistrarIntentoRequest.cs
+- RastreoResponse.cs
+
+SERVICIOS:
+- IEnvioService.cs
+- EnvioService.cs
+
+REGLAS:
+- EnvioRules.cs
+
+CONFIGURACIÓN:
+- Program.cs
+- appsettings.json
+- MensajeriaApi.csproj
+
+PRUEBAS:
+- MensajeriaApi.Tests.csproj
+- EnvioRulesTests.cs
+- EstadoRulesTests.cs
+- RequestTests.cs
+
+DOCUMENTACIÓN:
+- README.md
+- Resumen del chat en PDF
+- Este archivo TXT
+
+
+============================================================
+4. FUNCIONES PRINCIPALES DE LA API
+============================================================
+
+La API permite:
+
+1. Listar oficinas.
+2. Listar estados.
+3. Ver estados siguientes permitidos.
+4. Registrar envíos.
+5. Listar envíos.
+6. Buscar envío por código de rastreo.
+7. Cambiar estado de un envío.
+8. Registrar intento fallido.
+9. Guardar historial de cambios.
+10. Aplicar descuento si hay NIT válido.
+11. Calcular tarifa según peso.
+12. Bloquear estados inválidos.
+13. Cambiar automáticamente a EnDevolucion al tercer intento fallido.
+
+
+============================================================
+5. FLUJO DE ESTADOS
+============================================================
+
+Estados:
+
+1 = Registrado
+2 = EnTransito
+3 = EnReparto
+4 = Entregado
+5 = EnDevolucion
+6 = Devuelto
+
+Transiciones permitidas:
+
+Registrado -> EnTransito
+EnTransito -> EnReparto
+EnReparto -> Entregado
+EnReparto -> EnDevolucion
+EnDevolucion -> Devuelto
+
+Ejemplo de flujo normal:
+
+Registrado -> EnTransito -> EnReparto -> Entregado
+
+Ejemplo de flujo con devolución:
+
+Registrado -> EnTransito -> EnReparto -> EnDevolucion -> Devuelto
+
+La API no permite regresar a un estado anterior porque valida el cambio en la tabla TransicionEstado.
+
+
+============================================================
+6. PRUEBAS PROPUESTAS
+============================================================
+
+PRUEBAS EN SWAGGER O POSTMAN:
+
+1. GET /api/oficinas
+2. GET /api/estados
+3. GET /api/estados/1/siguientes
+4. POST /api/envios
+5. GET /api/envios
+6. GET /api/envios/{codigoRastreo}
+7. PUT /api/envios/{idEnvio}/estado
+8. POST /api/envios/{idEnvio}/intento-entrega
+
+PRUEBAS UNITARIAS:
+
+Se propusieron pruebas para:
+- Tarifas por peso.
+- Peso inválido.
+- NIT válido o inválido.
+- Descuento del 5%.
+- Total a pagar.
+- Intentos de entrega.
+- Cambio automático a devolución.
+- Estados finales.
+- DTOs principales.
+
+
+============================================================
+7. COMANDOS IMPORTANTES
+============================================================
+
+Crear proyecto de pruebas:
+
+dotnet new xunit -n MensajeriaApi.Tests
+
+Agregar referencia:
+
+dotnet add MensajeriaApi.Tests/MensajeriaApi.Tests.csproj reference MensajeriaApi/MensajeriaApi.csproj
+
+Instalar paquetes:
+
+dotnet add MensajeriaApi.Tests package Microsoft.NET.Test.Sdk
+dotnet add MensajeriaApi.Tests package xunit
+dotnet add MensajeriaApi.Tests package xunit.runner.visualstudio
+dotnet add MensajeriaApi.Tests package coverlet.collector
+
+Ejecutar API:
+
+dotnet run
+
+Ejecutar pruebas:
+
+dotnet test
+
+Limpiar y restaurar:
+
+dotnet clean
+dotnet restore
+
+
+============================================================
+8. REFLEXIÓN DEL PROCESO
+============================================================
+
+En este chat se empezó creando una API REST con una interfaz visual, pero durante el desarrollo se fue ajustando según lo que realmente se necesitaba.
+
+Primero se pensó en una interfaz con Tailwind para registrar y rastrear paquetes. Después se mejoró la interfaz para que fuera más dinámica y se dividió en varias páginas. Más adelante se decidió que no era necesaria la parte gráfica y que era mejor trabajar solo con Swagger, porque así era más directo probar la API.
+
+También se corrigieron errores importantes, como el problema de conexión con SQL Server y el problema de Swagger con Microsoft.OpenApi.Models. Esos errores ayudaron a limpiar mejor la configuración del proyecto.
+
+Una mejora importante fue cambiar la lógica de estados. Al principio se validaba desde C# usando texto, pero después se decidió hacerlo mejor con tablas en SQL. Eso dejó la API más ordenada, porque ahora los estados tienen ID y las transiciones válidas están en la base de datos.
+
+También se agregaron pruebas unitarias con xUnit. Para eso se separaron reglas como tarifa, NIT, descuento e intentos en una clase aparte. Esto hizo que el proyecto quedara más fácil de probar y defender.
+
+En general, el proyecto fue evolucionando desde una idea visual hasta una API más limpia, probada con Swagger, con base de datos organizada y con pruebas unitarias.
+
+
+============================================================
+9. CONCLUSIÓN SIMPLE
+============================================================
+
+El resultado final de este chat fue una API REST para mensajería y paquetería que permite registrar envíos, calcular tarifas, rastrear paquetes, cambiar estados correctamente y registrar historial.
+
+También se dejó preparada para pruebas con Swagger, Postman y xUnit.
+
+Se hicieron correcciones durante el proceso, principalmente en conexión a SQL Server, Swagger, estructura visual y validación de estados.
+
+Este archivo resume únicamente lo trabajado en este chat.

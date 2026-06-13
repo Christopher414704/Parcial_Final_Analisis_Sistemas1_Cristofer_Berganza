@@ -1,0 +1,169 @@
+10 HISTORIAS DE USUARIO - API REST DE MENSAJERÍA Y PAQUETERÍA
+
+Proyecto: Mensajería y Paquetería Nacional
+Formato usado:
+Como [rol], quiero [función], para [beneficio].
+
+
+============================================================
+HU-01 - Registrar envío
+============================================================
+
+Como operador de oficina,
+quiero registrar un nuevo envío con los datos del remitente, destinatario, oficinas y peso,
+para generar un paquete dentro del sistema y poder darle seguimiento.
+
+Criterios de aceptación:
+- El sistema debe permitir ingresar datos del remitente.
+- El sistema debe permitir ingresar datos del destinatario.
+- El sistema debe solicitar oficina de origen y oficina de destino.
+- El sistema debe solicitar el peso del paquete.
+- El sistema debe generar automáticamente un código de rastreo.
+- El envío debe iniciar con estado Registrado.
+
+
+============================================================
+HU-02 - Calcular tarifa automática
+============================================================
+
+Como operador de oficina,
+quiero que el sistema calcule automáticamente la tarifa del envío según el peso,
+para evitar errores al cobrar el servicio.
+
+Criterios de aceptación:
+- Si el peso es menor o igual a 1kg, la tarifa debe ser Q25.00.
+- Si el peso está entre 1.01kg y 5kg, la tarifa debe ser Q45.00.
+- Si el peso está entre 5.01kg y 10kg, la tarifa debe ser Q75.00.
+- Si el peso es mayor a 10kg, la tarifa debe ser Q100.00.
+- El sistema no debe aceptar pesos menores o iguales a 0.
+
+
+============================================================
+HU-03 - Aplicar descuento por NIT válido
+============================================================
+
+Como operador de oficina,
+quiero que el sistema aplique un descuento cuando el remitente o destinatario tenga NIT válido,
+para cumplir con la regla de descuento establecida.
+
+Criterios de aceptación:
+- El sistema debe validar el NIT del remitente.
+- El sistema debe validar el NIT del destinatario.
+- Si al menos uno de los dos NIT es válido, se debe aplicar 5% de descuento.
+- Si el NIT es CF o inválido, no debe aplicar descuento.
+- El total a pagar debe ser tarifa base menos descuento.
+
+
+============================================================
+HU-04 - Consultar oficinas disponibles
+============================================================
+
+Como operador de oficina,
+quiero consultar las oficinas disponibles,
+para seleccionar correctamente la oficina de origen, destino o actualización.
+
+Criterios de aceptación:
+- El sistema debe listar oficinas activas.
+- Cada oficina debe mostrar su identificador.
+- Cada oficina debe mostrar nombre y departamento.
+- Solo deben usarse oficinas existentes para registrar o actualizar envíos.
+
+
+============================================================
+HU-05 - Consultar estados disponibles
+============================================================
+
+Como operador del sistema,
+quiero consultar los estados disponibles de un envío,
+para saber qué etapas existen en el proceso de entrega.
+
+Criterios de aceptación:
+- El sistema debe listar todos los estados.
+- Cada estado debe tener un ID.
+- Cada estado debe tener un nombre.
+- El sistema debe indicar si el estado es final.
+- Los estados finales son Entregado y Devuelto.
+
+
+============================================================
+HU-06 - Cambiar estado del envío
+============================================================
+
+Como operador de oficina,
+quiero cambiar el estado de un envío,
+para actualizar el avance real del paquete.
+
+Criterios de aceptación:
+- El sistema debe solicitar el ID del envío.
+- El sistema debe solicitar el nuevo estado.
+- El sistema debe solicitar la oficina donde se realiza el cambio.
+- El sistema debe permitir agregar notas opcionales.
+- El sistema debe actualizar la fecha de modificación automáticamente.
+- El cambio debe quedar guardado en el historial.
+
+
+============================================================
+HU-07 - Validar avance correcto de estados
+============================================================
+
+Como administrador del sistema,
+quiero que los estados solo avancen en el orden permitido,
+para evitar que un paquete regrese a una etapa anterior o salte pasos incorrectamente.
+
+Criterios de aceptación:
+- Un envío en Registrado solo puede pasar a EnTransito.
+- Un envío en EnTransito solo puede pasar a EnReparto.
+- Un envío en EnReparto puede pasar a Entregado o EnDevolucion.
+- Un envío en EnDevolucion solo puede pasar a Devuelto.
+- Un envío en Entregado no debe cambiar a otro estado.
+- Un envío en Devuelto no debe cambiar a otro estado.
+- La validación debe realizarse con la tabla TransicionEstado.
+
+
+============================================================
+HU-08 - Registrar historial de cambios
+============================================================
+
+Como operador de oficina,
+quiero que cada cambio de estado se registre en un historial,
+para tener evidencia de todos los movimientos del paquete.
+
+Criterios de aceptación:
+- El historial debe guardar el nuevo estado.
+- El historial debe guardar la oficina donde se actualizó.
+- El historial debe guardar fecha y hora automáticamente.
+- El historial debe guardar notas opcionales.
+- El historial debe poder consultarse junto con el envío.
+
+
+============================================================
+HU-09 - Registrar intentos fallidos de entrega
+============================================================
+
+Como repartidor u operador de oficina,
+quiero registrar intentos fallidos de entrega,
+para controlar cuántas veces se intentó entregar un paquete.
+
+Criterios de aceptación:
+- Solo se pueden registrar intentos si el envío está en estado EnReparto.
+- El sistema debe aumentar el contador de intentos.
+- El sistema debe permitir máximo 3 intentos.
+- Cada intento debe quedar registrado en el historial.
+- Si todavía no llega al tercer intento, el envío debe seguir en EnReparto.
+
+
+============================================================
+HU-10 - Cambiar automáticamente a devolución
+============================================================
+
+Como administrador del sistema,
+quiero que al tercer intento fallido el envío cambie automáticamente a EnDevolucion,
+para iniciar el proceso de retorno del paquete.
+
+Criterios de aceptación:
+- Al primer intento fallido, el envío sigue en EnReparto.
+- Al segundo intento fallido, el envío sigue en EnReparto.
+- Al tercer intento fallido, el envío cambia a EnDevolucion.
+- El cambio automático debe quedar registrado en el historial.
+- Después de EnDevolucion, el envío solo puede pasar a Devuelto.
+

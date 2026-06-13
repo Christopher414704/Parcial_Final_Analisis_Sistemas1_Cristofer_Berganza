@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Envíos Rápidos GT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen text-slate-800">
+
+    <nav class="bg-slate-900 text-white shadow">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold">Envíos Rápidos GT</h1>
+                <p class="text-sm text-slate-300">Sistema de mensajería y paquetería nacional</p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <a href="/" class="nav-link">Inicio</a>
+                <a href="/Envios" class="nav-link">Registrar envíos</a>
+                <a href="/Estados" class="nav-link">Estados</a>
+                <a href="/Rastreo" class="nav-link">Rastreo</a>
+                <a href="/swagger" target="_blank" class="nav-link bg-blue-600 hover:bg-blue-700">Swagger</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        @RenderBody()
+    </main>
+
+    <style>
+        .nav-link {
+            padding: 0.55rem 0.9rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            background: #334155;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #475569;
+        }
+
+        .input {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.85rem;
+            padding: 0.75rem;
+            outline: none;
+            background: white;
+            margin-bottom: 0.75rem;
+        }
+
+        .input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.85rem;
+            font-weight: 800;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
