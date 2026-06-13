@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mensajeria-api
+    env: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=/data/mensajeria.db;Foreign Keys=True;
+    disk:
+      name: mensajeria-sqlite-disk
+      mountPath: /data
+      sizeGB: 1

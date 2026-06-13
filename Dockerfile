@@ -1,17 +1,29 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
+# Dockerfile para Render - API ASP.NET Core + SQLite
+# Coloca este archivo dentro de la carpeta MensajeriaApi,
+# en el mismo nivel donde está MensajeriaApi.csproj.
 
-USER root
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
 
-RUN mkdir -p /docker-entrypoint-initdb.d \
-    && chown -R mssql:root /docker-entrypoint-initdb.d /var/opt/mssql
+# Carpeta para guardar SQLite cuando Render tenga disco persistente.
+RUN mkdir -p /data
 
-COPY db/init.sql /docker-entrypoint-initdb.d/init.sql
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY ["MensajeriaApi.csproj", "./"]
+RUN dotnet restore "MensajeriaApi.csproj"
+
+COPY . .
+RUN dotnet publish "MensajeriaApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=build /app/publish .
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
-USER mssql
-
-EXPOSE 1433
-
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
